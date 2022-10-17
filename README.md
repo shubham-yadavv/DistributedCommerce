@@ -1,2 +1,2 @@
 # e-commerce
-backend for e-commerce application
+Microservice Architecture backend for e-commerce application
