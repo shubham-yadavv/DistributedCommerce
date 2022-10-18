@@ -1,4 +1,5 @@
 const express = require('express');
+const {PORT} = require('./config');
 
 const app = express();
 
@@ -6,10 +7,10 @@ app.use(express.json());
 
 app.use('/', (req,res,next) => {
 
-    return res.status(200).json({"msg": "Hello from Shopping"})
+    return res.status(200).json({"msg": "Hello from shopping"})
 })
 
 
-app.listen(8003, () => {
+app.listen(PORT, () => {
     console.log('Shopping is Listening to Port 8003')
 })

@@ -4,6 +4,5 @@ dotenv.config();
 
 module.exports = {
     PORT: process.env.PORT,
-    DB_URL: process.env.MONGO_URI,
-
+    DB_URL: process.env.MONGO_URL
 };
