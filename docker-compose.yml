@@ -51,8 +51,8 @@ services:
     ports:
       - "8001:8001"
     restart: always
-    # depends_on:
-    #   - "nosql-db"
+    depends_on:
+      - "nosql-db"
 
     volumes:
       - .:/app/
