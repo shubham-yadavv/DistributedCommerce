@@ -1,3 +1,3 @@
 module.exports = {
-    ProductModel: require('./product.model'),
+    ProductModel: require('./Product'),
 }

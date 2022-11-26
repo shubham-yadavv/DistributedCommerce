@@ -1,21 +1,22 @@
 const express = require('express');
-const {PORT} = require('./config');
-const connection = require('./database/connection')
+const { PORT } = require('./config');
+const { databaseConnection } = require('./database');
+const expressApp = require('./express-app');
 
-const StartServer = async () => {
+const StartServer = async() => {
+
     const app = express();
-
-    app.use(express.json());
-
-    await connection();
-
-    app.use('/', (req,res,next) => {
-
-        return res.status(200).json({"msg": "Hello from products"})
-    })
+    
+    await databaseConnection();
+    
+    await expressApp(app);
 
     app.listen(PORT, () => {
-        console.log('Products is Listening to Port 8002')
+        console.log(`listening to port ${PORT}`);
+    })
+    .on('error', (err) => {
+        console.log(err);
+        process.exit();
     })
 
 }

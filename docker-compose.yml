@@ -6,7 +6,7 @@ services:
       - "27018:27017"
     container_name: nosql-db
     volumes:
-      - mongo-db:/data/db:ro
+      - ./db/:/data/db
   products:
     build:
       dockerfile: Dockerfile
@@ -23,10 +23,7 @@ services:
 
     env_file:
       - ./products/.env
-    environment:
-      - MONGO_URL=mongodb://nosql-db:27017/products
     command: npm run dev
-    
   shopping:
     build:
       dockerfile: Dockerfile
@@ -35,8 +32,8 @@ services:
     ports:
       - "8003:8003"
     restart: always
-    # depends_on:
-    #   - "nosql-db"
+    depends_on:
+      - "nosql-db"
     volumes:
       - .:/app
       - /app/shopping/node_modules
@@ -53,14 +50,13 @@ services:
     restart: always
     depends_on:
       - "nosql-db"
+    command: npm run dev
 
     volumes:
       - .:/app/
       - /app/customer/node_modules
     env_file:
       - ./customer/.env
-    command: npm run dev
-
   nginx-proxy:
     build:
       dockerfile: Dockerfile
@@ -72,6 +68,8 @@ services:
     ports:
       - 80:80
 
-
-volumes:
-  mongo-db:
+  # rabbitmq:
+  #   image: rabbitmq
+  #   container_name: rabbitmq
+  #   ports:
+  #     - 5672:5672

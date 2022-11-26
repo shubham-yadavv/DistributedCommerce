@@ -1,15 +1,32 @@
 const express = require('express');
+const { PORT } = require('./config');
+const { databaseConnection } = require('./database');
+const expressApp = require('./express-app');
+const { CreateChannel } = require('./utils')
 
-const app = express();
+const StartServer = async() => {
 
-app.use(express.json());
+    const app = express();
+    
+    await databaseConnection();
 
-app.use('/', (req,res,next) => {
+    const channel = await CreateChannel()
 
-    return res.status(200).json({"msg": "Hello from customer"})
-})
+    await expressApp(app, channel);
+    
 
+    app.listen(PORT, () => {
+          console.log(`listening to port ${PORT}`);
+    })
+    .on('error', (err) => {
+        console.log(err);
+        process.exit();
+    })
+    .on('close', () => {
+        channel.close();
+    })
+    
 
-app.listen(8001, () => {
-    console.log('Shopping is Listening to Port 8003')
-})
+}
+
+StartServer();

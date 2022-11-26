@@ -1,5 +1,5 @@
 // database related modules
 module.exports = {
-    connection: require('./connection'),
+    databaseConnection: require('./connection'),
     ProductRepository: require('./repository/product-repository'),
 }
