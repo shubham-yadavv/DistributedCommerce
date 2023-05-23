@@ -1,13 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const axios = require("axios");
 const amqplib = require("amqplib");
-// const amqplib = require("amqplib/callback_api");
+
 
 
 const {
   APP_SECRET,
-  BASE_URL,
   EXCHANGE_NAME,
   MSG_QUEUE_URL,
 } = require("../config");
@@ -51,56 +49,40 @@ module.exports.FormateData = (data) => {
   }
 };
 
-//Raise Events
-module.exports.PublishCustomerEvent = async (payload) => {
-  axios.post("http://customer:8001/app-events/", {
-    payload,
-  });
-
-  //     axios.post(`${BASE_URL}/customer/app-events/`,{
-  //         payload
-  //     });
-};
-
-module.exports.PublishShoppingEvent = async (payload) => {
-  // axios.post('http://gateway:8000/shopping/app-events/',{
-  //         payload
-  // });
-
-  axios.post(`http://shopping:8003/app-events/`, {
-    payload,
-  });
-};
 
 //Message Broker
 
-// module.exports.CreateChannel = async () => {
-//   try {
-//     const connection = await amqplib.connect(MSG_QUEUE_URL);
-//     const channel = await connection.createChannel();
-//     await channel.assertQueue(EXCHANGE_NAME, "direct", { durable: true });
-//     return channel;
-//   } catch (err) {
-//     throw err;
-//   }
-// };
-
-
-// module.exports.PublishMessage = (channel, service, msg) => {
-//   channel.publish(EXCHANGE_NAME, service, Buffer.from(msg));
-//   console.log("Sent: ", msg);
-// };
-
-module.exports.PublishMessage = async (service, msg) => {
+module.exports.CreateChannel = async () => {
   try {
     const connection = await amqplib.connect(MSG_QUEUE_URL);
     const channel = await connection.createChannel();
-    await channel.assertQueue(EXCHANGE_NAME, "direct", { durable: true });
-    channel.publish(EXCHANGE_NAME, service, Buffer.from(msg));
-    console.log("Sent: ", msg);
+    await channel.assertExchange(EXCHANGE_NAME, "direct", false)
+    return channel;
   } catch (err) {
     throw err;
   }
+};
+
+
+module.exports.PublishMessage = async (channel, bindingKey, msg) => {
+  try {
+    channel.publish(EXCHANGE_NAME, bindingKey, Buffer.from(msg));
+    console.log("Sent: ", msg);
+    
+  } catch (error) {
+    throw error;
+  }
 }
 
+module.exports.SubscribeMessage = async (channel, service, bindingKey) => {
+    const queue = await channel.assertQueue(QUEUE_NAME);
+    channel.bindQueue(queue.queue, EXCHANGE_NAME, bindingKey);
+    channel.consume(queue.queue, data => {
+      console.log("recived data")
+      console.log(data.content.toString());
+      channel.ack(data);
+    }
+    );
+  }
+  
 
