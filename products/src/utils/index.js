@@ -2,6 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const amqplib = require("amqplib");
+// const amqplib = require("amqplib/callback_api");
+
 
 const {
   APP_SECRET,
@@ -72,18 +74,33 @@ module.exports.PublishShoppingEvent = async (payload) => {
 
 //Message Broker
 
-module.exports.CreateChannel = async () => {
+// module.exports.CreateChannel = async () => {
+//   try {
+//     const connection = await amqplib.connect(MSG_QUEUE_URL);
+//     const channel = await connection.createChannel();
+//     await channel.assertQueue(EXCHANGE_NAME, "direct", { durable: true });
+//     return channel;
+//   } catch (err) {
+//     throw err;
+//   }
+// };
+
+
+// module.exports.PublishMessage = (channel, service, msg) => {
+//   channel.publish(EXCHANGE_NAME, service, Buffer.from(msg));
+//   console.log("Sent: ", msg);
+// };
+
+module.exports.PublishMessage = async (service, msg) => {
   try {
     const connection = await amqplib.connect(MSG_QUEUE_URL);
     const channel = await connection.createChannel();
     await channel.assertQueue(EXCHANGE_NAME, "direct", { durable: true });
-    return channel;
+    channel.publish(EXCHANGE_NAME, service, Buffer.from(msg));
+    console.log("Sent: ", msg);
   } catch (err) {
     throw err;
   }
-};
+}
 
-module.exports.PublishMessage = (channel, service, msg) => {
-  channel.publish(EXCHANGE_NAME, service, Buffer.from(msg));
-  console.log("Sent: ", msg);
-};
+

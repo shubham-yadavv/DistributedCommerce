@@ -7,7 +7,6 @@ module.exports = (app, channel) => {
     
     const service = new CustomerService();
 
-    // To listen
     SubscribeMessage(channel, service);
 
 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { CustomerModel, AddressModel } = require('../models');
 
-//Dealing with data base operations
+// dealing with database
 class CustomerRepository {
 
     async CreateCustomer({ email, password, phone, salt }){
